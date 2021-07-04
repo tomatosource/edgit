@@ -1,8 +1,9 @@
 # edgit
 
-A simple text editor to edit files in a git repository with.
+Simple UI for editing/autosaving TODO.md from github.com/tomatosource/todo
 
 ## running
 
-yarn
-yarn dev
+`yarn`
+
+`yarn dev`
