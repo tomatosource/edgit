@@ -30,7 +30,7 @@ async function go() {
           authorization: `token ${token}`,
         },
         message: "update todo.md",
-        content: btoa(raw),
+        content: btoa(newVal),
         sha: getResult.data.sha,
       });
       lastSaved = newVal;
