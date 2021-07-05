@@ -21,7 +21,9 @@ async function go() {
   const textAreaEle = document.getElementById("textarea");
   textAreaEle.textContent = raw;
 
+  let sha = getResult.data.sha;
   let lastSaved = raw;
+
   setInterval(async () => {
     const newVal = textAreaEle.value;
     if (newVal != lastSaved) {
@@ -31,8 +33,17 @@ async function go() {
         },
         message: "update todo.md",
         content: btoa(newVal),
-        sha: getResult.data.sha,
+        sha,
       });
+      const getResult = await request(
+        "GET /repos/tomatosource/todo/contents/todo.md",
+        {
+          headers: {
+            authorization: `token ${token}`,
+          },
+        }
+      );
+      sha = getResult.data.sha;
       lastSaved = newVal;
     }
   }, 5000);
