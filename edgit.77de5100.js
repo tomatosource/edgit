@@ -1395,11 +1395,9 @@ function go() {
                 switch (_a.label) {
                   case 0:
                     newVal = textAreaEle.value;
-                    console.log(newVal);
                     if (!(newVal != lastSaved)) return [3
                     /*break*/
                     , 2];
-                    console.log("saving");
                     return [4
                     /*yield*/
                     , request_1.request("PUT /repos/tomatosource/todo/contents/todo.md", {
