@@ -1,4 +1,68 @@
-parcelRequire=function(e,r,t,n){var i,o="function"==typeof parcelRequire&&parcelRequire,u="function"==typeof require&&require;function f(t,n){if(!r[t]){if(!e[t]){var i="function"==typeof parcelRequire&&parcelRequire;if(!n&&i)return i(t,!0);if(o)return o(t,!0);if(u&&"string"==typeof t)return u(t);var c=new Error("Cannot find module '"+t+"'");throw c.code="MODULE_NOT_FOUND",c}p.resolve=function(r){return e[t][1][r]||r},p.cache={};var l=r[t]=new f.Module(t);e[t][0].call(l.exports,p,l,l.exports,this)}return r[t].exports;function p(e){return f(p.resolve(e))}}f.isParcelRequire=!0,f.Module=function(e){this.id=e,this.bundle=f,this.exports={}},f.modules=e,f.cache=r,f.parent=o,f.register=function(r,t){e[r]=[function(e,r){r.exports=t},{}]};for(var c=0;c<t.length;c++)try{f(t[c])}catch(e){i||(i=e)}if(t.length){var l=f(t[t.length-1]);"object"==typeof exports&&"undefined"!=typeof module?module.exports=l:"function"==typeof define&&define.amd?define(function(){return l}):n&&(this[n]=l)}if(parcelRequire=f,i)throw i;return f}({"NqYy":[function(require,module,exports) {
-function e(e,n,t,r,a,i,s){try{var c=e[i](s),o=c.value}catch(u){return void t(u)}c.done?n(o):Promise.resolve(o).then(r,a)}function n(n){return function(){var t=this,r=arguments;return new Promise(function(a,i){var s=n.apply(t,r);function c(n){e(s,a,i,c,o,"next",n)}function o(n){e(s,a,i,c,o,"throw",n)}c(void 0)})}}var t=1,r="offline",a="index.html";self.addEventListener("install",function(e){e.waitUntil(n(regeneratorRuntime.mark(function e(){var n;return regeneratorRuntime.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,caches.open(r);case 2:return n=e.sent,e.next=5,n.add(new Request(a,{cache:"reload"}));case 5:case"end":return e.stop()}},e)}))())}),self.addEventListener("activate",function(e){e.waitUntil(n(regeneratorRuntime.mark(function e(){return regeneratorRuntime.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:if(!("navigationPreload"in self.registration)){e.next=3;break}return e.next=3,self.registration.navigationPreload.enable();case 3:case"end":return e.stop()}},e)}))()),self.clients.claim()}),self.addEventListener("fetch",function(e){"navigate"===e.request.mode&&e.respondWith(n(regeneratorRuntime.mark(function n(){var t,i,s,c;return regeneratorRuntime.wrap(function(n){for(;;)switch(n.prev=n.next){case 0:return n.prev=0,n.next=3,e.preloadResponse;case 3:if(!(t=n.sent)){n.next=6;break}return n.abrupt("return",t);case 6:return n.next=8,fetch(e.request);case 8:return i=n.sent,n.abrupt("return",i);case 12:return n.prev=12,n.t0=n.catch(0),console.log("Fetch failed; returning offline page instead.",n.t0),n.next=17,caches.open(r);case 17:return s=n.sent,n.next=20,s.match(a);case 20:return c=n.sent,n.abrupt("return",c);case 22:case"end":return n.stop()}},n,null,[[0,12]])}))())});
-},{}]},{},["NqYy"], null)
-//# sourceMappingURL=/sw.js.map
+// Incrementing OFFLINE_VERSION will kick off the install event and force
+// previously cached resources to be updated from the network.
+const OFFLINE_VERSION = 1;
+const CACHE_NAME = "offline";
+const OFFLINE_URL = "index.html";
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      // Setting {cache: 'reload'} in the new request will ensure that the response
+      // isn't fulfilled from the HTTP cache; i.e., it will be from the network.
+      await cache.add(new Request(OFFLINE_URL, { cache: "reload" }));
+    })()
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      // Enable navigation preload if it's supported.
+      // See https://developers.google.com/web/updates/2017/02/navigation-preload
+      if ("navigationPreload" in self.registration) {
+        await self.registration.navigationPreload.enable();
+      }
+    })()
+  );
+
+  // Tell the active service worker to take control of the page immediately.
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (event) => {
+  // We only want to call event.respondWith() if this is a navigation request
+  // for an HTML page.
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      (async () => {
+        try {
+          // First, try to use the navigation preload response if it's supported.
+          const preloadResponse = await event.preloadResponse;
+          if (preloadResponse) {
+            return preloadResponse;
+          }
+
+          const networkResponse = await fetch(event.request);
+          return networkResponse;
+        } catch (error) {
+          // catch is only triggered if an exception is thrown, which is likely
+          // due to a network error.
+          // If fetch() returns a valid HTTP response with a response code in
+          // the 4xx or 5xx range, the catch() will NOT be called.
+          console.log("Fetch failed; returning offline page instead.", error);
+
+          const cache = await caches.open(CACHE_NAME);
+          const cachedResponse = await cache.match(OFFLINE_URL);
+          return cachedResponse;
+        }
+      })()
+    );
+  }
+
+  // If our if() condition is false, then this fetch handler won't intercept the
+  // request. If there are any other fetch handlers registered, they will get a
+  // chance to call event.respondWith(). If no fetch handlers call
+  // event.respondWith(), the request will be handled by the browser as if there
+  // were no service worker involvement.
+});
