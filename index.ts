@@ -26,9 +26,7 @@ async function go() {
   let lastSaved = raw;
   setInterval(async () => {
     const newVal = textAreaEle.value;
-    console.log(newVal);
     if (newVal != lastSaved) {
-      console.log("saving");
       await request("PUT /repos/tomatosource/todo/contents/todo.md", {
         headers: {
           authorization: `token ${token}`,
