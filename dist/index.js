@@ -4,7 +4,9 @@ const tokenKey = "token_storage_key";
 
 async function go() {
   let token = localStorage.getItem(tokenKey);
-  if (!token) {
+  console.log(token, !!token, token == null, token == "null");
+  if (!token || token == "null") {
+    console.log("HELLO??!?");
     token = window.prompt("token pls");
     localStorage.setItem(tokenKey, token);
   }
