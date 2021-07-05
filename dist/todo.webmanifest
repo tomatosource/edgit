@@ -1,1 +1,22 @@
-{"name":"TODO","short_name":"TODO","description":"TODO","icons":[{"src":"favicon-32x32.1be96438.png","sizes":"32x32","type":"image/png"},{"src":"android-chrome-512x512.a2cd414f.png","sizes":"512x512","type":"image/png"}],"start_url":"index.html","display":"standalone","theme_color":"#FFFFFF","background_color":"#FFFFFF"}
+{
+  "name": "TODO",
+  "short_name": "TODO",
+  "description": "TODO",
+  "icons": [
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF"
+}
+
